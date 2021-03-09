@@ -1,0 +1,7 @@
+name = "hearvo"
+type = "webpack"
+account_id = "6f823e3a85c27a1e5380e36937981645"
+workers_dev = true
+route = ""
+zone_id = "1e2a21782c228cf2e25b6549b554669c"
+webpack_config = "webpack.config.js"
