@@ -4,6 +4,13 @@ const BASE_API = "https://stormy-forest-01163.herokuapp.com/api/v1.0";
 const IMAGE_URL = "https://us.hearvo.com/logo512.png";
 
 
+
+
+
+
+
+
+
 export async function handleRequest(request: Request): Promise<Response> {
 
   const { method, headers, url } = request;
@@ -15,9 +22,11 @@ export async function handleRequest(request: Request): Promise<Response> {
   */
   if (isbot(userAgent)) {
 
-    const basePath = url.split('/');
+    const basePath = url.split('/'); // [ 'https:', '', 'us.hearvo.com', 'posts', '100' ]
     const check = basePath[basePath.length - 2];
 
+
+    // post detail page. e.g. https://us.hearvo.com/posts/100
     // check if the page is posts/:post_id
     if (check === "posts") {
 
@@ -67,14 +76,69 @@ export async function handleRequest(request: Request): Promise<Response> {
           }
         })
         .transform(res)
+
+
+
+    } else {
+      // other pages
+      // title: Hearvo
+      // description: Your voice must be heard.
+
+      const title = "Hearvo";
+      const description = "Your voice must be heard.";
+      const res = await fetch(url, {
+        method,
+        headers,
+      });
+
+      return new HTMLRewriter()
+        .on('head > meta[property="og:title"]', {
+          element(e) {
+            const content = e.getAttribute("content")
+            if (content) {
+              e.setAttribute(
+                "content",
+                content.replace("____OG_PAGE_TITLE____", title),
+              )
+            }
+          }
+        })
+        .on('head > meta[property="og:description"]', {
+          element(e) {
+            const content = e.getAttribute("content")
+            if (content) {
+              e.setAttribute(
+                "content",
+                content.replace("____OG_PAGE_DESCRIPTION____", description),
+              )
+            }
+          }
+        })
+        .on('head > meta[property="og:image"]', {
+          element(e) {
+            const content = e.getAttribute("content")
+            if (content) {
+              e.setAttribute(
+                "content",
+                content.replace("____OG_PAGE_IMAGE____", IMAGE_URL),
+              )
+            }
+          }
+        })
+        .transform(res)
+
     }
 
-    const res = await fetch(url, {
-      method,
-      headers,
-    });
-    return res;
+    // const res = await fetch(url, {
+    //   method,
+    //   headers,
+    // });
+    // return res;
   }
+
+  /*
+  Not bot
+  */
 
 
   return fetch(url, {
